@@ -108,7 +108,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
 {
     // auto start = high_resolution_clock::now();
     sol s1;
-
     /*  calculating sum of demands for all customer */
     int sumofdemand = 0;
     for (int j = 0; j < customer + 1; j++)
@@ -122,8 +121,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     {
         sumofcapacity += truckarr[j].capacity;
     }
-    // std::cout << sumofdemand << endl
-    //           << sumofcapacity << endl;
 
     /*  calculating ratio of Extern Cost and Demands of customers   */
     vector<vector<float>> ratio_extCostbyDemand(customer, vector<float>(2));
@@ -135,14 +132,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
 
     /*  sorting the ratio   */
     sort(ratio_extCostbyDemand.begin(), ratio_extCostbyDemand.end(), sortcol);
-    // for (int i = 0; i < customer; i++)
-    // {
-    //     for (int j = 0; j < 2; j++)
-    //     {
-    //         std::cout << ratio_extCostbyDemand[i][j] << "\t";
-    //     }
-    //     std::cout << "\n";
-    // }
 
     /*  storing the nodes which have lower ratio in a vector    */
     vector<int> visitedbyExternalVehicle, visitedbyinternalfleet;
@@ -159,11 +148,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     }
 
     s1.notvisited = visitedbyExternalVehicle;
-    // std::cout << "Customers visited by External Fleet" << endl;
-    // for (int x : visitedbyExternalVehicle)
-    // {
-    //     std::cout << x << " ";
-    // }
 
     /*  since we've nodes visited by external fleet storing the remaining nodes from 1 to number of customer in another vector  */
     unordered_set<int> s(visitedbyExternalVehicle.begin(), visitedbyExternalVehicle.end());
@@ -176,10 +160,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     }
     // std::cout << "\nCustomers visited by Internal Fleet" << endl;
     visitedbyinternalfleet = s1.visited;
-    // for (int x : visitedbyinternalfleet)
-    // {
-    //     std::cout << x << " ";
-    // }
 
     /*  creating a copy of distance matrix in another 2-D vector    */
     /*  and increasing all the rows and columns of the nodes visited by external fleet by a high number */
@@ -231,11 +211,12 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     int v = 0;
     int remcapacity = 0;
     vector<float> distanceofEachfleet;
-    // sol *routearr = new sol[vehicle];
     vector<pair<int, int>> Capacitypair, varcostpair;
     Capacitypair = sortArr(TrCapcty, TrCapcty.size());
     varcostpair = sortArr(varcost, varcost.size());
 
+    vector<vector<int>> route1(vehicle);
+    s1.vehicleroute = route1;
     /*
 ! Start of route finding, here two loops have been used one runs upto no of vehicle and the inner loop continues until the remaining capacity becomes > 0
 ? a break conditions is there -  a) if the remaining capacity remains > 0 but any other unserved customer dont have that amount of demand or  less than that
@@ -244,24 +225,27 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     while (v < vehicle)
     {
         totaldistance = 0;
+        int routeIndex;
         if (checkequal(TrCapcty) == 1)
         {
             if (checkequal(varcost) == 1)
             {
                 remcapacity = truckarr[v].capacity;
+                routeIndex = v;
             }
             else
             {
                 remcapacity = truckarr[varcostpair[v].second].capacity;
+                routeIndex = varcostpair[v].second;
             }
         }
         else
         {
             remcapacity = truckarr[Capacitypair[v].second].capacity;
+            routeIndex = Capacitypair[v].second;
         }
         while (remcapacity > 0)
         {
-
             for (int j = 0; j < customer + 1; j++)
             {
                 checkingarr.push_back(distanceCopy[i][j]);
@@ -286,14 +270,15 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
         }
         //! end of inner while, which will give one route
         route.push_back(0);
-        s1.vehicleroute.push_back(route);
+        s1.vehicleroute[routeIndex] = route;
         route.clear();
         route.push_back(0);
+        i = 0;
         s1.remcapacityofvehicle.push_back(remcapacity);
         std::cout << "\nRoute of Vehicle " << v + 1 << ": " << endl;
-        for (int i = 0; i < s1.vehicleroute[v].size(); i++)
+        for (int x = 0; x < s1.vehicleroute[v].size(); x++)
         {
-            std::cout << s1.vehicleroute[v][i] << "\t";
+            std::cout << s1.vehicleroute[v][x] << "\t";
         }
         std::cout << "\nRemaining Capacity for vehicle " << v + 1 << ": " << remcapacity << endl;
         //? keeping distance of each fleet stored in a vector
@@ -310,17 +295,8 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     visitedbyExternalVehicle = findMissingnodes(visited, 1, customer);
 
     s1.notvisited = visitedbyExternalVehicle;
-    // std::cout << "Customers visited by External Fleet after all vehicle routed: " << endl;
-    // for (int x : visitedbyExternalVehicle)
-    // {
-    //     std::cout << x << " ";
-    // }
+
     k = 0;
-    // for (float x : distanceofEachfleet)
-    // {
-    //     std::cout << "\nDistance of route" << k + 1 << " : " << x;
-    //     k++;
-    // }
 
     //! Now the rest is calculation for the solution value
 
@@ -329,7 +305,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     {
         s1.ext_transportcost += customerdata[visitedbyExternalVehicle[x]][4];
     }
-    // std::cout << "\nExternal Transportation cost: " << s1.ext_transportcost << endl;
 
     float totalvariablecost = 0;
     for (int x = 0; x < vehicle; x++)
@@ -343,30 +318,6 @@ sol VRPPC::initialsol(vector<vector<int>> &customerdata, vector<vector<float>> &
     }
     float costofInternalfleet = totalfixedcostofTruck + totalvariablecost;
     s1.initcost = costofInternalfleet + s1.ext_transportcost;
-    // std::cout << "Total cost for the internal fleet: " << costofInternalfleet << endl;
-    // std::cout << "\nObjective Value for Initial Solution: " << s1.initcost << endl;
-
-    // for(int i = 0; i < s1.vehicleroute.size(); i++)
-    // {
-    //     cout << "\nfor route " << i << endl; 
-    //     for(int j = 0; j < s1.vehicleroute[i].size(); j++)
-    //     {
-    //         cout << customerdata[s1.vehicleroute[i][j]][1] << " ";
-    //     }
-    // }
-
-    // for(int i = 0; i < s1.vehicleroute.size(); i++)
-    // {
-    //     cout << "\nfor route " << i << endl; 
-    //     for(int j = 0; j < s1.vehicleroute[i].size(); j++)
-    //     {
-    //         cout << customerdata[s1.vehicleroute[i][j]][2] << " ";
-    //     }
-    // }
-
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // std::cout << "\nTime taken by function : " << duration.count() << " microseconds" << endl;
 
     return s1;
 }
