@@ -49,4 +49,4 @@ vehicles + variable cost for the used vehicles (A)
 iii. Objective value = B + Cost of external transporter for the external
 vehicles
 
-# To read more please check the VRPPC_Doc.pdf
+# To read more please check the VRPPC_documentationNew.pdf
