@@ -82,7 +82,7 @@ public:
     }
     int extractIntegerWords(string str);    //! this will extract integer from each line and return that
     void extractint(string str, int arr[]); //! this is similar to previous one except it will store the intergers in an array
-    void takeInputFile(string);                   //! this is the function to open the file to read the data store the customer and truck details
+    void takeInputFile(string);             //! this is the function to open the file to read the data store the customer and truck details
     void showCustomerData();
     void showVehicleData();
     void showDistanceMatrix();
@@ -96,28 +96,18 @@ public:
     liststruct *end;
 
     /*
-    ? following functions work in objective function file
-    */
-    // vector<int> returnvisitednodes(vector<int> &, vector<int> &, vector<int> &, vector<int> &); //! this stores all nodes where
-    //                                                                                             //!truck has visited
-    // vector<int> findMissing(vector<int> &, int, int);   //! this will give the record of customers who have not been visited by
-    //                                                     //! internal vehicle
-    // int costforExternalTransport(vector<int>);
-    // float findDistanceofroute(vector<int> &, vector<vector<float>> &);
-    // float calculatevariablecost(float, int);
-    // int totalFixedcost(truck*);
-    // float objectivevalue(float, int);
-    // float objectivefunction(vector<vector<int>>&, vector<vector<float>> &, truck *, sol*);
-    /*
     ? below function works for initial solution file, we are passing the customer array wehere all details of customer lies, distance matrix and the truck details and it will return a structure where initial solution and customer visited by internal fleet and external fleet will also be there
     */
     sol initialsol(vector<vector<int>> &, vector<vector<float>> &, truck *);
-    sol newsol(vector<vector<int>> &, vector<vector<float>> &, truck *, sol);
-    // swapwithinRoute newalgo(vector<vector<int>> &, vector<vector<float>> &, truck *, twoOpt, int, sol);
-    sol adjacentSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol);
-    sol one_oneSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol);
-    sol singleInsertionSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol);
-    sol externalNodeInsertion(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol);
-    sol externalNodeSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol);
+    sol newsol(vector<vector<int>> &, vector<vector<float>> &, truck *, sol, float);
+    sol swapWithMaxLink(vector<vector<int>> &, vector<vector<float>> &, truck *, sol, float);
+    sol insertWithMaxLink(vector<vector<int>> &, vector<vector<float>> &, truck *, sol, float);
+    sol adjacentSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol, float);
+    sol one_oneSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol, float);
+    sol singleInsertionSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol, float);
+    sol externalNodeInsertion(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol, float);
+    sol externalNodeSwapping(vector<vector<int>> &, vector<vector<float>> &, truck *, int, sol, float);
     int min_func(vector<float>, vector<int>);
+    void objectiveFunction(vector<vector<int>> &, vector<vector<float>> &, truck *);
+    sol nbdFunction(vector<vector<int>> &, vector<vector<float>> &, truck *, sol, float);
 };
