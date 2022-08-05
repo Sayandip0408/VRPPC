@@ -42,7 +42,9 @@ This is a function for computing the objective value after obtaining the routes.
 The calculations are as follows :
 
 i. Variable cost of a vehicle (A) = total distance traveled * VAR. COST
+
 ii. Total cost for the internal fleet (B) = FIXED COST for the used
 vehicles + variable cost for the used vehicles (A)
+
 iii. Objective value = B + Cost of external transporter for the external
 vehicles
