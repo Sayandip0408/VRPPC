@@ -107,7 +107,7 @@ vector<int> smallestInRow(vector<vector<float>> mat)
     return arr;
 }
 
-sol VRPPC::newsol(vector<vector<int>> &customerdata, vector<vector<float>> &distMatrix, truck *truckarr, sol s1)
+sol VRPPC::newsol(vector<vector<int>> &customerdata, vector<vector<float>> &distMatrix, truck *truckarr, sol s1, float randomMultiplier)
 {
     sol s2;
     vector<vector<float>> meandistMatrix(vehicle, vector<float>(vehicle));
@@ -118,10 +118,11 @@ sol VRPPC::newsol(vector<vector<int>> &customerdata, vector<vector<float>> &dist
             break;
         }
         meandistMatrix = find_meandistmatrix(customerdata, s1, vehicle);
+
         vector<int> min_meandist = smallestInRow(meandistMatrix);
+
         int l = min_meandist[k];
         for (int i = 1; i < s1.vehicleroute[k].size() - 1; i++)
-
         {
             for (int j = 1; j < s1.vehicleroute[l].size() - 1; j++)
             {
@@ -130,32 +131,25 @@ sol VRPPC::newsol(vector<vector<int>> &customerdata, vector<vector<float>> &dist
                 int temp = routecopy1[i];
                 routecopy1[i] = routecopy2[j];
                 routecopy2[j] = temp;
+
                 int capacity1 = capacityCheck(routecopy1, customerdata);
                 int capacity2 = capacityCheck(routecopy2, customerdata);
                 float distance1 = checkDistance(routecopy1, distMatrix);
                 float distance2 = checkDistance(routecopy2, distMatrix);
-                if (capacity1 < truckarr[k].capacity - s1.remcapacityofvehicle[k] && capacity2 < truckarr[l].capacity - s1.remcapacityofvehicle[l])
+                if (capacity1 <= truckarr[k].capacity && capacity2 <= truckarr[l].capacity)
                 {
-                    if (distance1 < s1.routeDistance[k] && distance2 < s1.routeDistance[l])
+                    if (distance1 + distance2 < (s1.routeDistance[k] + s1.routeDistance[l]) * randomMultiplier)
                     {
                         s1.vehicleroute[k] = routecopy1;
                         s1.vehicleroute[l] = routecopy2;
                         s1.routeDistance[k] = distance1;
                         s1.routeDistance[l] = distance2;
-                        s1.remcapacityofvehicle[k] = truckarr[k].capacity - capacity1;
-                        s1.remcapacityofvehicle[l] = truckarr[l].capacity - capacity2;
                     }
                 }
             }
         }
     }
     float objvalue = objectivefunc(customerdata, distMatrix, truckarr, vehicle, s1.routeDistance, s1.ext_transportcost);
-    // cout << "objective value after modified Two Opt swapping " << objvalue << endl;
-    cout << "\nRoute Distances after applying Two opt" << endl;
-    for (float x : s1.routeDistance)
-    {
-        cout << x << "\t";
-    }
     s2.ext_transportcost = s1.ext_transportcost;
     s2.initcost = objvalue;
     s2.notvisited = s1.notvisited;
